@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page d'Inscription</title>
+    <link rel="stylesheet" href="style3.css">
+</head>
+<body>
+            <ul class="menu">
+                <li><a href="index.php">Accueil</a></li>
+                <li><a href="login.php">Connexion</a></li>
+            </ul>
+
+    <div class="signup-container">
+        <h2>Inscription</h2>
+        <form action="../back/inscription.php" method="post">
+            <label for="username">Nom :</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="name">Prénom :</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email">Email :</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Mot de passe :</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="confirm-password">Confirmer le mot de passe :</label>
+            <input type="password" id="confirm-password" name="confirm-password" required>
+
+            <input type="submit" value="S'inscrire">
+        </form>
+    </div>
+</body>
+</html>
