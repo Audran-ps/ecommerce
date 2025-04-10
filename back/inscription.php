@@ -1,6 +1,4 @@
 <?php
-
-
 $host = 'localhost';        // Adresse du serveur MySQL
 $dbname = 'ecommerce'; // Nom de ta base de données
 $user = 'root';      // Ton identifiant MySQL
