@@ -18,21 +18,23 @@ $nom = $_POST['username'] ?? '';
 $prenom= $_POST['name'] ?? '';
 $email = $_POST['email'] ?? '';
 $mdp= $_POST['password'] ?? '';
+$hashedPassword = password_hash($mdp, PASSWORD_DEFAULT);
 
     try {
         // Requête d'insertion sécurisée
-        $sql = "INSERT INTO user (nom, prenom, email, mdp ) VALUES (:nom, :prenom, :email, :mdp)";
+        $sql = "INSERT INTO user (nom, prenom, email, mdp ) VALUES (:nom, :prenom, :email, :hashedPassword)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             ':nom' => $nom,
             ':prenom' => $prenom,
             ':email' => $email,
-            ':mdp' => $mdp,
+            ':hashedPassword' => $hashedPassword,
         ]);
     }
 //         echo "✅ Données enregistrées avec succès !";
     catch (PDOException $e) {
         echo "❌ Erreur lors de l'enregistrement : " . $e->getMessage();
     }
+
 
 ?>
