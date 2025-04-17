@@ -22,7 +22,7 @@ $hashedPassword = password_hash($mdp, PASSWORD_DEFAULT);
 
     try {
         // Requête d'insertion sécurisée
-        $sql = "INSERT INTO user (nom, prenom, email, mdp ) VALUES (:nom, :prenom, :email, :hashedPassword)";
+        $sql = "INSERT INTO client (nom, prenom, email, mot_de_passe ) VALUES (:nom, :prenom, :email, :hashedPassword)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             ':nom' => $nom,

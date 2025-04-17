@@ -1,46 +1,50 @@
 <?php
-// Connexion
+// Connexion à la base de données
 try {
-    $conn = new PDO("mysql:host=localhost;dbname=e_commerce", "root", "");
+    $conn = new PDO("mysql:host=localhost;dbname=ecommerce;charset=utf8", "root", "");
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    die("Erreur : " . $e->getMessage());
+    die("❌ Erreur de connexion : " . $e->getMessage());
 }
 
 // Traitement du formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Sécurisation des données
     $prenom = htmlspecialchars($_POST['firstname'] ?? '');
     $nom = htmlspecialchars($_POST['lastname'] ?? '');
     $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
     $mdp = $_POST['password'] ?? '';
     $confirm = $_POST['confirmPassword'] ?? '';
-    $birthdate = $_POST['birthdate'] ?? '';
+    $birthdate = $_POST['birthdate'] ?? ''; // Ce champ n’est pas encore utilisé dans la requête
 
-    if ($mdp !== $confirm) {
-        die("Les mots de passe ne correspondent pas.");
+    // Vérification des champs obligatoires
+    if (empty($prenom) || empty($nom) || empty($email) || empty($mdp) || empty($confirm)) {
+        die("⚠️ Tous les champs sont obligatoires.");
     }
 
+    // Vérification du mot de passe
+    if ($mdp !== $confirm) {
+        die("❌ Les mots de passe ne correspondent pas.");
+    }
+
+    // Hachage du mot de passe
     $hashedPassword = password_hash($mdp, PASSWORD_DEFAULT);
     $username = $prenom . ' ' . $nom;
 
+    // Insertion en base de données
     try {
         $sql = $conn->prepare("INSERT INTO users (username, password, email, statue) VALUES (?, ?, ?, 'en ligne')");
         $sql->execute([$username, $hashedPassword, $email]);
 
         if ($sql->rowCount()) {
-            // Redirection affirmée  vers la page de connexion
+            // Redirection vers la page de connexion en cas de succès
             header("Location: ../vue/login.html");
             exit();
         } else {
-            echo "Erreur lors de l'inscription.";
+            echo "❌ Une erreur est survenue lors de l'inscription.";
         }
     } catch (PDOException $e) {
-        die("Erreur : " . $e->getMessage());
+        die("❌ Erreur lors de l'enregistrement : " . $e->getMessage());
     }
 }
-$hashedPassword = password_hash($mdp, PASSWORD_DEFAULT);
-    $username = $prenom . ' ' . $nom;
-
-    try {
-        $sql = $conn->prepare("INSERT INTO users (username, password, email, statue) VALUES (?, ?, ?, 'en ligne')");
-        $sql->execute([$username, $hashedPassword, $email]);
+?>
