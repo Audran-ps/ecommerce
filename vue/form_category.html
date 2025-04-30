@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Ajouter une Catégorie</title>
+</head>
+<body>
+    <h2>Ajouter une nouvelle catégorie</h2>
+    <form action="insert_category.php" method="POST">
+        <label for="name_category">Nom de la catégorie :</label><br>
+        <input type="text" name="name_category" required><br><br>
+
+        <label for="description">Description :</label><br>
+        <textarea name="description" rows="4" cols="50" required></textarea><br><br>
+
+        <input type="submit" value="Ajouter">
+    </form>
+</body>
+</html>

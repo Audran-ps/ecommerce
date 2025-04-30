@@ -14,19 +14,19 @@ try {
     echo "❌ Erreur de connexion : " . $e->getMessage();
 }
 // Récupération des données du formulaire
-$nom = $_POST['username'] ?? '';
-$prenom= $_POST['name'] ?? '';
+$name = $_POST['username'] ?? '';
+$username= $_POST['name'] ?? '';
 $email = $_POST['email'] ?? '';
-$mdp= $_POST['password'] ?? '';
-$hashedPassword = password_hash($mdp, PASSWORD_DEFAULT);
+$password= $_POST['password'] ?? '';
+$hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     try {
         // Requête d'insertion sécurisée
-        $sql = "INSERT INTO client (nom, prenom, email, mot_de_passe ) VALUES (:nom, :prenom, :email, :hashedPassword)";
+        $sql = "INSERT INTO users (name, username, email, password ) VALUES (:nom, :prenom, :email, :hashedPassword)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
-            ':nom' => $nom,
-            ':prenom' => $prenom,
+            ':nom' => $name,
+            ':prenom' => $username,
             ':email' => $email,
             ':hashedPassword' => $hashedPassword,
         ]);
