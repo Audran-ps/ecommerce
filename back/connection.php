@@ -1,4 +1,5 @@
 <?php
+
 // Connexion à la base de données
 try {
     $conn = new PDO("mysql:host=localhost;dbname=ecommerce;charset=utf8", "root", "");
@@ -7,7 +8,7 @@ try {
     die("❌ Erreur de connexion : " . $e->getMessage());
 }
 
-// Traitement du formulaire
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Sécurisation des données
     $prenom = htmlspecialchars($_POST['firstname'] ?? '');
@@ -35,16 +36,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $sql = $conn->prepare("INSERT INTO users (username, password, email, statue) VALUES (?, ?, ?, 'en ligne')");
         $sql->execute([$username, $hashedPassword, $email]);
-
-        if ($sql->rowCount()) {
-            // Redirection vers la page de connexion en cas de succès
             header("Location: ../vue/login.html");
-            exit();
+
         } else {
-            echo "❌ Une erreur est survenue lors de l'inscription.";
+            echo "Une erreur est survenue lors de l'inscription.";
         }
     } catch (PDOException $e) {
-        die("❌ Erreur lors de l'enregistrement : " . $e->getMessage());
+        die("Erreur lors de l'enregistrement : " . $e->getMessage());
     }
-}
+
 ?>

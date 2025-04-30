@@ -13,6 +13,9 @@ try {
     // En cas d’erreur, afficher le message
     echo "❌ Erreur de connexion : " . $e->getMessage();
 }
+
+
+
 // Récupération des données du formulaire
 $name = $_POST['username'] ?? '';
 $username= $_POST['name'] ?? '';
