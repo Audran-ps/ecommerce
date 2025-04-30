@@ -1,7 +1,7 @@
 <?php
 global $produit;
-include 'shoppingcart.php';
-include 'navbar.html';
+
+include 'navbar.php';
 ?>
 
 <!DOCTYPE html>
@@ -84,10 +84,6 @@ include 'navbar.html';
             <?php foreach ($produit as $row): ?>
                 <div class="col-md-6 col-lg-3">
                     <div class="card shadow-sm h-100">
-                        <?php
-                        // Chemin vers les images
-                        $imagePath = "../manga/" . $row['product_id'] . ".jpeg";
-                        ?>
 
                         <img src="<?= htmlspecialchars($imagePath) ?>"
                              class="card-img-top"
