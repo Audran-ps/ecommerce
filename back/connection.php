@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
     $mdp = $_POST['password'] ?? '';
     $confirm = $_POST['confirmPassword'] ?? '';
-    $birthdate = $_POST['birthdate'] ?? ''; // Ce champ n’est pas encore utilisé dans la requête
+    $birthdate = $_POST['birthdate'] ?? '';
 
     // Vérification des champs obligatoires
     if (empty($prenom) || empty($nom) || empty($email) || empty($mdp) || empty($confirm)) {
@@ -36,13 +36,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $sql = $conn->prepare("INSERT INTO users (username, password, email, statue) VALUES (?, ?, ?, 'en ligne')");
         $sql->execute([$username, $hashedPassword, $email]);
-            header("Location: ../vue/login.html");
 
-        } else {
-            echo "Une erreur est survenue lors de l'inscription.";
-        }
+        header("Location: ../back/boutique.php");
+        exit;
+
     } catch (PDOException $e) {
         die("Erreur lors de l'enregistrement : " . $e->getMessage());
     }
-
+}
 ?>
