@@ -8,7 +8,7 @@ try {
     // Connexion à la base de données avec PDO
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $password);
 
-    echo "✅ Connexion réussie à la base de données.";
+    
 } catch (PDOException $e) {
     // En cas d’erreur, afficher le message
     echo "❌ Erreur de connexion : " . $e->getMessage();
@@ -34,7 +34,7 @@ $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             ':hashedPassword' => $hashedPassword,
         ]);
     }
-//         echo "✅ Données enregistrées avec succès !";
+  echo "✅ Données enregistrées avec succès !";
     catch (PDOException $e) {
         echo "❌ Erreur lors de l'enregistrement : " . $e->getMessage();
     }

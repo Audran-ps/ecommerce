@@ -15,32 +15,3 @@ try {
 }
 
 include('connection.php');
-
-// Ajout de produit
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajouter'])) {
-    $nom = $_POST['nom'];
-    $prix = $_POST['prix'];
-    $image_url = $_POST['image_url'];
-    $category_id = $_POST['category_id'];
-
-    $stmt = $pdo->prepare("INSERT INTO products (nom, prix, image_url, category_id) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$nom, $prix, $image_url, $category_id]);
-    header("Location: product.php");
-    exit;
-}
-
-// Suppression
-if (isset($_GET['delete'])) {
-    $id = $_GET['delete'];
-    $stmt = $pdo->prepare("DELETE FROM products WHERE id = ?");
-    $stmt->execute([$id]);
-    header("Location: product.php");
-    exit;
-}
-
-// Récupération des catégories
-$categories = $pdo->query("SELECT * FROM category")->fetchAll();
-?>
-
-</body>
-</html>
