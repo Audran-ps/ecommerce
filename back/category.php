@@ -19,3 +19,5 @@ include 'connection.php';
 $sql = "SELECT * FROM category";
 $stmt = $pdo->query($sql);
 $cateogie_recuperer = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+return $categories;

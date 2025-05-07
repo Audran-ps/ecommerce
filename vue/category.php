@@ -6,9 +6,13 @@
     <title>Boutique</title>
 </head>
 <body>
-    <?php 
-    
+    <?php
+    $categories = include 'get_categories.php';
     ?>
+    
+    <?php foreach ($categories as $categorie): ?>
+        <li><?= htmlspecialchars($categorie['nom']) ?></li>
+    <?php endforeach; ?>
 
 </body>
 </html>
