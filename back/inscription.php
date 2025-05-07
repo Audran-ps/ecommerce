@@ -33,11 +33,9 @@ $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             ':email' => $email,
             ':hashedPassword' => $hashedPassword,
         ]);
+        echo "✅ Données enregistrées avec succès !";
     }
-  echo "✅ Données enregistrées avec succès !";
+
     catch (PDOException $e) {
         echo "❌ Erreur lors de l'enregistrement : " . $e->getMessage();
     }
-
-
-?>

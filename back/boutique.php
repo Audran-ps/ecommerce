@@ -15,3 +15,4 @@ try {
 }
 
 include('connection.php');
+$sql = "SELECT * from category" ;
