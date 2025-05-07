@@ -18,4 +18,4 @@ include 'connection.php';
 
 $sql = "SELECT * FROM category";
 $stmt = $pdo->query($sql);
-$categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$cateogie_recuperer = $stmt->fetchAll(PDO::FETCH_ASSOC);

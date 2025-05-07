@@ -6,6 +6,9 @@
     <title>Boutique</title>
 </head>
 <body>
+    <?php 
     
+    ?>
+
 </body>
 </html>
