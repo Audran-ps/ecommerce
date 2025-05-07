@@ -14,5 +14,8 @@ try {
     echo "❌ Erreur de connexion : " . $e->getMessage();
 }
 
-include('connection.php');
-$sql = "SELECT * from category" ;
+include 'connection.php';
+
+$sql = "SELECT * FROM category";
+$stmt = $pdo->query($sql);
+$categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
