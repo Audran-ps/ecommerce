@@ -47,10 +47,6 @@
     include '../back/category.php';
     ?>
     
-    <?php foreach ($categorie_recuperer as $categorie): ?>
-        <a href=""><?= htmlspecialchars($categorie['name_category']) ?></a>
-    <?php endforeach; ?>
-
 <!-- BANNIÈRE HERO -->
 <div class="hero-banner">
     <h1>out of core</h1>
@@ -59,7 +55,7 @@
 <!-- CATEGORIES -->
 <div class="category-links">
     <?php foreach ($categorie_recuperer as $categorie): ?>
-        <a href="?category=<?= urlencode($categorie['Id_category']) ?>"></a>
+        <a href="?category=<?= urlencode($categorie['Id_category']) ?>">
             <?= htmlspecialchars($categorie['name_category']) ?>
         </a>
     <?php endforeach; ?>
@@ -69,9 +65,7 @@
 <div class="container">
     <div class="row">
         <?php
-        // Connexion à la BDD
-        $conn = new PDO("mysql:host=localhost;dbname=ecommerce;charset=utf8", "root", "");
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
 
         // Récupération des produits selon la catégorie sélectionnée
         $categoryId = $_GET['categorie'] ?? null;
