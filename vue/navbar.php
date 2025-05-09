@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="navbar.css"> <!-- Remplace ce chemin par le bon -->
+<link rel="stylesheet" href="navbar.css">
 
 <header>
     <div class="logo">
