@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
   <div class="container">
-    <a class="navbar-brand fw-bold text-primary" href="index.php">
+    <a class="navbar-brand fw-bold text-primary" href="index.php"> //
       <img src="logo.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top me-2">
       MonSite
     </a>
