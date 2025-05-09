@@ -1,0 +1,13 @@
+a.category-btn {
+    border: 1px solid #29d9d5;
+    padding: 10px 20px;
+    color: #29d9d5;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+a.category-btn:hover {
+    background-color: #29d9d5;
+    color: #fff;
+}
+
