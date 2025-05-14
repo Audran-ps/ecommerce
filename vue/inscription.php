@@ -1,5 +1,24 @@
 <?php
 include 'navbar.php';
+session_start(); 
+// Regénérer le CAPTCHA si demandé
+if (isset($_GET['refresh_captcha'])) {
+    unset($_SESSION['captcha_code']);
+}
+// Générer un nouveau CAPTCHA si non existant
+if (!isset($_SESSION['captcha_code'])) {
+    $_SESSION['captcha_code'] = rand(1000, 9999);
+}
+// Dans inscription.php avant le HTML
+$captchaCode = rand(1000, 9999);
+$_SESSION['captcha_code'] = $captchaCode;
+$image = imagecreatetruecolor(100, 30);
+$bg = imagecolorallocate($image, 255, 255, 255);
+$text = imagecolorallocate($image, 0, 0, 0);
+imagefilledrectangle($image, 0, 0, 100, 30, $bg);
+imagestring($image, 5, 20, 5, $captchaCode, $text);
+imagepng($image, 'captcha.png');
+imagedestroy($image);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -8,97 +27,118 @@ include 'navbar.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page d'Inscription</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;400;500&display=swap" rel="stylesheet">
+    <img src="captcha.png" alt="CAPTCHA"><br>
+    <input type="text" name="captcha" required>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Raleway', sans-serif;
-        }
-
         body {
-            background-color: #111;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px 20px;
-            min-height: 100vh;
-        }
+    margin: 0;
+    padding: 0;
+    background-color: #0f0f0f;
+    font-family: 'Raleway', sans-serif;
+    color: white;
+}
 
-        .signup-container {
-            background-color: #222;
-            padding: 30px;
-            border-radius: 10px;
-            width: 100%;
-            max-width: 500px;
-            box-shadow: 0 0 10px #29d9d5;
-        }
+.signup-container {
+    max-width: 400px;
+    margin: 100px auto;
+    background-color: #1c1c1c;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px #00e6e6;
+    text-align: center;
+}
 
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #29d9d5;
-        }
+.signup-container h2 {
+    color: #00e6e6;
+    font-size: 32px;
+    margin-bottom: 20px;
+}
 
-        form label {
-            display: block;
-            margin: 15px 0 5px;
-            font-weight: 500;
-        }
+.signup-container label {
+    display: block;
+    margin-top: 15px;
+    text-align: left;
+    font-weight: bold;
+}
 
-        form input[type="text"],
-        form input[type="email"],
-        form input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            background-color: transparent;
-            border: 1px solid #29d9d5;
-            color: #fff;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
+.signup-container input[type="text"],
+.signup-container input[type="email"],
+.signup-container input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    background-color: #e6f0ff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+}
 
-        form input[type="submit"] {
-            margin-top: 25px;
-            width: 100%;
-            padding: 12px;
-            background-color: #29d9d5;
-            border: none;
-            color: #111;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.3s;
-            border-radius: 5px;
-        }
+.signup-container input[type="submit"] {
+    width: 100%;
+    margin-top: 20px;
+    background-color: #00e6e6;
+    color: black;
+    font-weight: bold;
+    border: none;
+    padding: 10px;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
 
-        form input[type="submit"]:hover {
-            background-color: #1fb3b0;
-        }
+.signup-container input[type="submit"]:hover {
+    background-color: #00cccc;
+}
 
-        ::placeholder {
-            color: #ccc;
-        }
+.login-link {
+    margin-top: 15px;
+    font-size: 14px;
+}
 
-        .login-link {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-        }
+.login-link a {
+    color: #00e6e6;
+    text-decoration: none;
+}
 
-        .login-link a {
-            color: #29d9d5;
-            text-decoration: none;
-            font-weight: bold;
-        }
+.login-link a:hover {
+    text-decoration: underline;
+}
 
-        .login-link a:hover {
-            text-decoration: underline;
-        }
+/* CAPTCHA */
+.captcha-container {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.captcha-box {
+    display: inline-block;
+    background-color: white;
+    color: black;
+    padding: 5px 10px;
+    font-weight: bold;
+    font-size: 18px;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+
+.refresh-btn {
+    margin-left: 10px;
+    background: none;
+    border: none;
+    color: #00e6e6;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.refresh-btn:hover {
+    color: #00cccc;
+}
+
     </style>
 </head>
 <body>
+    
 
     <div class="signup-container">
         <h2>Inscription</h2>
@@ -118,14 +158,32 @@ include 'navbar.php';
             <label for="confirm-password">Confirmer le mot de passe :</label>
             <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirmer" required>
 
-<label for="captcha">Captcha :</label>
-<img src="../utils/captcha.php" alt="Captcha" style="margin: 10px 0;"><br>
-<input type="text" id="captcha" name="captcha" placeholder="Entrez le captcha" required>
+            <form method="POST" action="../back/inscription.php">
+               <!-- Autres champs de ton formulaire -->
+            <!-- Section CAPTCHA améliorée -->
+            <div class="captcha-container">
+                <label for="captcha">Code de vérification :</label><br>
+                <div>
+                    <span class="captcha-box"><?php echo $_SESSION['captcha_code']; ?></span>
+                    <button type="button" class="refresh-btn" onclick="refreshCaptcha()">
+                        🔄 Regénérer
+                    </button>
+                </div>
+                <input type="text" name="captcha" id="captcha" 
+                       placeholder="Entrez le code ci-dessus" required>
+            </div>
 
             <input type="submit" value="S'inscrire">
-
+            
             <p class="login-link">Déjà inscrit ? <a href="conection.php">Connectez-vous ici</a>.</p>
         </form>
     </div>
+
+    <script>
+        function refreshCaptcha() {
+            // Recharge la page avec un paramètre pour regénérer le CAPTCHA
+            window.location.href = window.location.pathname + '?refresh_captcha=true';
+        }
+    </script>
 </body>
 </html>

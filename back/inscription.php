@@ -1,58 +1,50 @@
 <?php
-$host = 'localhost';        // Adresse du serveur MySQL
-$dbname = 'ecommerce'; // Nom de ta base de données
-$user = 'root';      // Ton identifiant MySQL
-$password = ''; // Ton mot de passe MySQL
+session_start();
 
-try {
-    // Connexion à la base de données avec PDO
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $password);
-
-    
-} catch (PDOException $e) {
-    // En cas d’erreur, afficher le message
-    echo "❌ Erreur de connexion : " . $e->getMessage();
+// Vérification CAPTCHA en premier
+if (!isset($_POST['captcha']) || $_POST['captcha'] != $_SESSION['captcha_code']) {
+    die('❌ Erreur : Le code CAPTCHA est incorrect.');
 }
 
+// Réinitialiser le CAPTCHA après vérification
+unset($_SESSION['captcha_code']);
 
+// Connexion DB et traitement du formulaire
+$host = 'localhost';
+$dbname = 'ecommerce';
+$user = 'root';
+$password = '';
 
-// Récupération des données du formulaire
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $password);
+} catch (PDOException $e) {
+    die("❌ Erreur de connexion : " . $e->getMessage());
+}
+
+// Récupération et validation des données
 $name = $_POST['username'] ?? '';
-$username= $_POST['name'] ?? '';
+$username = $_POST['name'] ?? '';
 $email = $_POST['email'] ?? '';
-$password= $_POST['password'] ?? '';
+$password = $_POST['password'] ?? '';
+$confirm_password = $_POST['confirm-password'] ?? '';
+
+// Vérification mot de passe
+if ($password !== $confirm_password) {
+    die('❌ Les mots de passe ne correspondent pas');
+}
+
 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    try {
-        // Requête d'insertion sécurisée
-        $sql = "INSERT INTO users (name, username, email, password ) VALUES (:nom, :prenom, :email, :hashedPassword)";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            ':nom' => $name,
-            ':prenom' => $username,
-            ':email' => $email,
-            ':hashedPassword' => $hashedPassword,
-        ]);
-        echo "✅ Données enregistrées avec succès !";
-    }
-
-    catch (PDOException $e) {
-        echo "❌ Erreur lors de l'enregistrement : " . $e->getMessage();
-    }
-    // Vérification des champs obligatoires
-if (isset($_POST['firstname'], $_POST['lastname'], $_POST['email'], $_POST['password'], $_POST['confirmPassword'], $_POST['captcha'])) {
-
-    $firstname = htmlspecialchars(trim($_POST['firstname']));
-    $lastname = htmlspecialchars(trim($_POST['lastname']));
-    $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
-    $password = trim($_POST['password']);
-    $confirmPassword = trim($_POST['confirmPassword']);
-    $captchaInput = trim($_POST['captcha']);
-
-    // Vérification du captcha
-    if ($captchaInput !== $_SESSION['captcha']) {
-        $_SESSION['register_error'] = "Captcha incorrect. Veuillez réessayer.";
-        header('Location: ../vue/inscription.php');
-        exit();
-    }
+try {
+    $sql = "INSERT INTO users (name, username, email, password) VALUES (:nom, :prenom, :email, :hashedPassword)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        ':nom' => $name,
+        ':prenom' => $username,
+        ':email' => $email,
+        ':hashedPassword' => $hashedPassword,
+    ]);
+    echo "✅ Inscription réussie !";
+} catch (PDOException $e) {
+    echo "❌ Erreur : " . $e->getMessage();
 }
