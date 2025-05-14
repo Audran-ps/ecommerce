@@ -118,6 +118,10 @@ include 'navbar.php';
             <label for="confirm-password">Confirmer le mot de passe :</label>
             <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirmer" required>
 
+<label for="captcha">Captcha :</label>
+<img src="../utils/captcha.php" alt="Captcha" style="margin: 10px 0;"><br>
+<input type="text" id="captcha" name="captcha" placeholder="Entrez le captcha" required>
+
             <input type="submit" value="S'inscrire">
 
             <p class="login-link">Déjà inscrit ? <a href="conection.php">Connectez-vous ici</a>.</p>

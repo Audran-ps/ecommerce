@@ -39,3 +39,20 @@ $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
     catch (PDOException $e) {
         echo "❌ Erreur lors de l'enregistrement : " . $e->getMessage();
     }
+    // Vérification des champs obligatoires
+if (isset($_POST['firstname'], $_POST['lastname'], $_POST['email'], $_POST['password'], $_POST['confirmPassword'], $_POST['captcha'])) {
+
+    $firstname = htmlspecialchars(trim($_POST['firstname']));
+    $lastname = htmlspecialchars(trim($_POST['lastname']));
+    $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
+    $password = trim($_POST['password']);
+    $confirmPassword = trim($_POST['confirmPassword']);
+    $captchaInput = trim($_POST['captcha']);
+
+    // Vérification du captcha
+    if ($captchaInput !== $_SESSION['captcha']) {
+        $_SESSION['register_error'] = "Captcha incorrect. Veuillez réessayer.";
+        header('Location: ../vue/inscription.php');
+        exit();
+    }
+}
