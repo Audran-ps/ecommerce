@@ -7,7 +7,8 @@
         <li><a href="category.php">Accueil</a></li>
         <li><a href="inscription.php">Inscription</a></li>
         <li><a href="conection.php">Connection</a></li>
-        <li><a href="shoppingcart.php">Pannier</a></li>
+        <li><a href="shoppingcart.php">🛒 Panier (<?= isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0 ?>)</a></li>
+
     </ul>
     <a href="reservation.php" class="btn-reservation">Réserver</a>
 
