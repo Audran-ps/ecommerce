@@ -32,6 +32,7 @@
 </div>
 
 <!-- PRODUITS PAR CATÉGORIE -->
+<form method="post" action="shoppingcart.php"></form>
 <?php if (!empty($produits)): ?>
     <div style="max-width: 1200px; margin: 0 auto;">
         <h2 style="text-align:center; color:#29d9d5; margin-bottom: 30px;">Produits de la catégorie sélectionnée</h2>
@@ -52,7 +53,7 @@
                         <p class="stock">Stock : <?= htmlspecialchars($produit['stock_quantity']) ?></p>
 
                         <!-- Formulaire d'ajout au panier -->
-                        <form method="post" action="ajouter_panier.php">
+
                             <input type="hidden" name="id_product" value="<?= $produit['id_product'] ?>">
                             <button type="submit" class="add-to-cart-btn">Ajouter au panier</button>
                         </form>
