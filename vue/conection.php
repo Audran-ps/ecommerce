@@ -25,6 +25,10 @@
             <input type="submit" id="submit" value="LOGIN">
             <p class="signup-link">Pas encore inscrit ? <a href="inscription.php">Créez un compte ici</a>.</p>
 
+           
         </form>
+         <form action="../back/mdp_oublie.php" method="post">
+            <input type="submit" value="mot de passe oublié">
+            </form>
 </body>
 </html>
