@@ -10,7 +10,7 @@ try {
     die("❌ Erreur de connexion : " . $e->getMessage());
 }
 ?>
-<form action="mail.php">
+<form action="mail.php" id="email">
 
 <input type="text">
 </form>
