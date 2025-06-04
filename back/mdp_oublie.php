@@ -1,6 +1,15 @@
 <?php
-require 'inscription.php'; // Ton fichier de configuration PHPMailer
-require 'db.php';     // Connexion PDO à ta base de données
+$host = 'localhost';
+$dbname = 'ecommerce';
+$user = 'root';
+$password = '';
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $password);
+} catch (PDOException $e) {
+    die("❌ Erreur de connexion : " . $e->getMessage());
+}
+
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = $_POST['email'];

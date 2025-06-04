@@ -9,7 +9,7 @@
 <body>
         
 <?php
-    include '../back/connection.php';
+    // include '../back/connection.php';
     include 'navbar.php';
 ?>
         <!-- Formulaire de connexion -->
