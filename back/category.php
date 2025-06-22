@@ -1,21 +1,35 @@
 <?php
-$host = 'localhost';        // Adresse du serveur MySQL
-$dbname = 'ecommerce'; // Nom de ta base de données
-$user = 'root';      // Ton identifiant MySQL
-$password = ''; // Ton mot de passe MySQL
+$host = 'localhost';
+$dbname = 'ecommerce';
+$user = 'root';
+$password = '';
 
 try {
-    // Connexion à la base de données avec PDO
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $password);
-
-
 } catch (PDOException $e) {
-    // En cas d’erreur, afficher le message
     echo "❌ Erreur de connexion : " . $e->getMessage();
+    exit;
 }
 
+// Récupération des catégories
 $sql = "SELECT * FROM category";
 $stmt = $pdo->query($sql);
 $categorie_recuperer = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-return $categorie_recuperer;
+// Si une catégorie est sélectionnée, on récupère les produits associés
+$produits = [];
+
+if (isset($_GET['category'])) {
+    $id_category = intval($_GET['category']);
+
+    $stmt = $pdo->prepare("SELECT * FROM product WHERE id_category = :id_category");
+    $stmt->bindParam(':id_category', $id_category, PDO::PARAM_INT);
+    $stmt->execute();
+    $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Ces variables seront disponibles dans la vue
+return [
+    'categories' => $categorie_recuperer,
+    'produits' => $produits
+];

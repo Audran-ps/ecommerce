@@ -1,87 +1,115 @@
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Raleway', sans-serif;
-        }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Raleway', sans-serif;
+}
 
-        body {
-            background-color: #111;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
+body {
+    background-color: #111;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
 
-        form {
-            background-color: #222;
-            padding: 30px;
-            border-radius: 10px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 0 10px #29d9d5;
-        }
+form {
+    background-color: #222;
+    padding: 30px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 0 10px #29d9d5;
+    margin-bottom: 20px;
+}
 
-        h1 {
-            text-align: center;
-            color: #29d9d5;
-            margin-bottom: 20px;
-            font-size: 2.2rem;
-        }
+h1 {
+    text-align: center;
+    color: #29d9d5;
+    margin-bottom: 20px;
+    font-size: 2.2rem;
+}
 
-        label {
-            display: block;
-            margin: 10px 0 5px;
-            font-weight: 500;
-        }
+label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: 500;
+}
 
-        input[type="text"],
-        input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            background-color: transparent;
-            border: 1px solid #29d9d5;
-            color: #fff;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    background-color: transparent;
+    border: 1px solid #29d9d5;
+    color: #fff;
+    border-radius: 5px;
+    font-size: 1rem;
+}
 
-        input[type="submit"] {
-            margin-top: 20px;
-            width: 100%;
-            padding: 10px;
-            background-color: #29d9d5;
-            border: none;
-            color: #111;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.3s;
-            border-radius: 5px;
-        }
+input[type="submit"] {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    background-color: #29d9d5;
+    border: none;
+    color: #111;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+    border-radius: 5px;
+}
 
-        input[type="submit"]:hover {
-            background-color: #1fb3b0;
-        }
+input[type="submit"]:hover {
+    background-color: #1fb3b0;
+}
 
-        ::placeholder {
-            color: #ccc;
-        }
+::placeholder {
+    color: #ccc;
+}
 
-        .signup-link {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-        
-        .signup-link a {
-            color: #29d9d5;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        
-        .signup-link a:hover {
-            text-decoration: underline;
-        }
+.signup-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.signup-link a {
+    color: #29d9d5;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
+/* Spécifique au deuxième formulaire (mot de passe oublié) */
+form[action*="mdp_oublie.php"] {
+    background-color: transparent;
+    box-shadow: none;
+    padding: 0;
+    text-align: center;
+}
+
+form[action*="mdp_oublie.php"] input[type="submit"] {
+    background-color: transparent;
+    border: none;
+    color: #29d9d5;
+    font-size: 0.9rem;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 0;
+}
+
+form[action*="mdp_oublie.php"] input[type="submit"]:hover {
+    color: #1fb3b0;
+    text-decoration: none;
+}
+
         

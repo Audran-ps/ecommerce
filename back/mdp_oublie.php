@@ -12,5 +12,6 @@ try {
 ?>
 <form action="mail.php" method="post" >
 
-<input type="text" id="email">
+<input name= "email" type="text" id="email">
+<input type="submit">
 </form>

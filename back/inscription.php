@@ -19,21 +19,21 @@ try {
     die("❌ Erreur de connexion : " . $e->getMessage());
 }
 
-// Récupération des données
+// Récupération des données du formulaire
 $name = $_POST['username'] ?? '';
 $username = $_POST['name'] ?? '';
 $email = $_POST['email'] ?? '';
 $password = $_POST['password'] ?? '';
 $confirm_password = $_POST['confirm-password'] ?? '';
 
-// Vérification mot de passe
+// Vérification des mots de passe
 if ($password !== $confirm_password) {
     die('❌ Les mots de passe ne correspondent pas.');
 }
 
 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-// Insertion dans la base
+// Insertion dans la base de données
 try {
     $sql = "INSERT INTO users (name, username, email, password) VALUES (:nom, :prenom, :email, :hashedPassword)";
     $stmt = $pdo->prepare($sql);
@@ -60,7 +60,7 @@ try {
     $mail->Host       = 'smtp.gmail.com';
     $mail->SMTPAuth   = true;
     $mail->Username   = 'paysaudran@gmail.com';       // ➤ Ton adresse Gmail
-    $mail->Password   = 'ibom vaod cibr mkvj' ;   // ➤ Mot de passe d'application
+    $mail->Password   = 'ibom vaod cibr mkvj';        // ➤ Mot de passe d'application
     $mail->SMTPSecure = 'tls';
     $mail->Port       = 587;
 
@@ -70,7 +70,7 @@ try {
 
     // Contenu du mail
     $mail->isHTML(true);
-    $mail->Subject = "Bienvenue sur notre site, $username !";
+    $mail->Subject = "Bienvenue sur notre site Nanos, $username !";
     $mail->Body    = "
         <h1>Inscription réussie</h1>
         <p>Bonjour $username,</p>
