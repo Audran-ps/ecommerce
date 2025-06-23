@@ -186,7 +186,7 @@
         <li><a href="panier.php">🛒 Panier (<?= isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0 ?>)</a></li>
     </ul>
 
-    <a href="reservation.php" class="btn-reservation">Réserver</a>
+    <a href="contact.php" class="btn-reservation">Contact</a>
     <div class="responsive-menu"></div>
 </header>
 
