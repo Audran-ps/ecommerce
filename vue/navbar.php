@@ -183,7 +183,7 @@
         <li><a href="category.php">Accueil</a></li>
         <li><a href="inscription.php">Inscription</a></li>
         <li><a href="conection.php">Connexion</a></li>
-        <li><a href="shoppingcart.php">🛒 Panier (<?= isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0 ?>)</a></li>
+        <li><a href="panier.php">🛒 Panier (<?= isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0 ?>)</a></li>
     </ul>
 
     <a href="reservation.php" class="btn-reservation">Réserver</a>
