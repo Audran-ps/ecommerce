@@ -1,94 +1,826 @@
 <?php
 session_start();
 
-// Connexion à la base de données
-$pdo = new PDO('mysql:host=localhost;dbname=ecommerce;charset=utf8', 'root', '');
+// Initialiser le panier s'il n'existe pas
+if (!isset($_SESSION['panier'])) {
+    $_SESSION['panier'] = [];
+}
 
-// Ajout au panier
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_id'])) {
-    $product_id = intval($_POST['category_id']);
-
-    // Récupérer les infos du category
-    $stmt = $pdo->prepare("SELECT * FROM  WHERE id = ?");
-    $stmt->execute([$product_id]);
-    $category = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($category) {
-        // Ajouter ou incrémenter le category dans la session
-        if (!isset($_SESSION['panier'][$product_id])) {
-            $_SESSION['panier'][$product_id] = [
-                'id' => $category['id'],
-                'name' => $category['name'],
-                'price' => $category['price'],
-                'image' => $category['image'],
-                'quantity' => 1
-            ];
-        } else {
-            $_SESSION['panier'][$product_id]['quantity']++;
-        }
-
-        header("Location: panier.php");
-        exit;
+// Traitement des actions AJAX
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    header('Content-Type: application/json');
+    
+    switch ($_POST['action']) {
+        case 'update_quantity':
+            $index = intval($_POST['index']);
+            $quantity = intval($_POST['quantity']);
+            if (isset($_SESSION['panier'][$index]) && $quantity > 0) {
+                $_SESSION['panier'][$index]['quantity'] = $quantity;
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false]);
+            }
+            exit;
+            
+        case 'remove_item':
+            $index = intval($_POST['index']);
+            if (isset($_SESSION['panier'][$index])) {
+                array_splice($_SESSION['panier'], $index, 1);
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false]);
+            }
+            exit;
+            
+        case 'clear_cart':
+            $_SESSION['panier'] = [];
+            echo json_encode(['success' => true]);
+            exit;
     }
 }
 
-// Récupérer les éléments du panier
-$panier = $_SESSION['panier'] ?? [];
-
+// Calcul du total
 $total = 0;
+$itemCount = 0;
+foreach ($_SESSION['panier'] as $item) {
+    $total += $item['price'] * $item['quantity'];
+    $itemCount += $item['quantity'];
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Mon Panier</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Panier - Nanos</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary-color: #29d9d5;
+            --secondary-color: #1fb3af;
+            --dark-bg: #222;
+            --white-text: #fff;
+            --light-gray: #f8f9fa;
+            --border-color: #e0e0e0;
+            --transition-speed: 0.3s;
+            --danger-color: #ff4757;
+            --success-color: #2ed573;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        /* Styles du header depuis navbar.php */
+        header {
+            background-color: var(--dark-bg);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            padding: 0 5%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo a {
+            font-size: 2.4rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color var(--transition-speed) ease;
+        }
+
+        .logo a:hover {
+            color: var(--secondary-color);
+        }
+
+        .logo a span {
+            color: var(--white-text);
+        }
+
+        .menu {
+            display: flex;
+            list-style: none;
+            align-items: center;
+            margin: 0;
+        }
+
+        .menu li {
+            margin: 0 15px;
+            position: relative;
+        }
+
+        .menu li a {
+            color: var(--white-text);
+            font-size: 1.4rem;
+            text-decoration: none;
+            position: relative;
+            transition: color var(--transition-speed) ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .menu li a:hover {
+            color: var(--primary-color);
+        }
+
+        .menu li a::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            height: 2px;
+            width: 0%;
+            background-color: var(--primary-color);
+            transition: width var(--transition-speed) ease;
+        }
+
+        .menu li a:hover::after {
+            width: 100%;
+        }
+
+        .cart-count {
+            background-color: var(--primary-color);
+            color: #000;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.8rem;
+            margin-left: 5px;
+            font-weight: bold;
+        }
+
+        .btn-reservation {
+            color: var(--primary-color);
+            font-size: 1.4rem;
+            border: 2px solid var(--primary-color);
+            padding: 5px 20px;
+            transition: all var(--transition-speed) ease;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .btn-reservation:hover {
+            background-color: var(--primary-color);
+            color: var(--dark-bg);
+            transform: translateY(-2px);
+        }
+
+        /* Container principal */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: var(--dark-bg);
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .cart-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        /* Section des produits */
+        .cart-items {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-cart-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-cart h2 {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .empty-cart p {
+            color: #999;
+            margin-bottom: 30px;
+        }
+
+        .cart-item {
+            display: grid;
+            grid-template-columns: 120px 1fr auto;
+            gap: 20px;
+            padding: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            transition: all var(--transition-speed) ease;
+            animation: slideIn 0.4s ease;
+        }
+
+        .cart-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(41, 217, 213, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .cart-item-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: var(--light-gray);
+        }
+
+        .cart-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .cart-item:hover .cart-item-image img {
+            transform: scale(1.1);
+        }
+
+        .cart-item-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .cart-item-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark-bg);
+            margin-bottom: 8px;
+        }
+
+        .cart-item-info {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .cart-item-info span {
+            display: inline-block;
+            margin-right: 15px;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            width: 35px;
+            height: 35px;
+            border: 2px solid var(--primary-color);
+            background: white;
+            color: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all var(--transition-speed) ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .cart-item-actions {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .item-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            color: var(--danger-color);
+            cursor: pointer;
+            font-size: 1.8rem;
+            transition: all var(--transition-speed) ease;
+            padding: 5px;
+        }
+
+        .remove-btn:hover {
+            transform: rotate(90deg) scale(1.2);
+        }
+
+        /* Section résumé */
+        .cart-summary {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .cart-summary h2 {
+            font-size: 1.5rem;
+            color: var(--dark-bg);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .summary-row.total {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            padding-top: 20px;
+            margin-top: 20px;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .promo-code {
+            margin: 25px 0;
+        }
+
+        .promo-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .promo-input input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .promo-input button {
+            padding: 12px 20px;
+            background: var(--dark-bg);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .promo-input button:hover {
+            background: var(--primary-color);
+            color: var(--dark-bg);
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(41, 217, 213, 0.3);
+        }
+
+        .checkout-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(41, 217, 213, 0.4);
+        }
+
+        .continue-shopping {
+            width: 100%;
+            padding: 15px;
+            background: white;
+            color: var(--dark-bg);
+            border: 2px solid var(--dark-bg);
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            margin-top: 15px;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .continue-shopping:hover {
+            background: var(--dark-bg);
+            color: white;
+        }
+
+        .clear-cart-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: 600;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .clear-cart-btn:hover {
+            background: #ff3838;
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .cart-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .cart-summary {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .cart-item {
+                grid-template-columns: 80px 1fr;
+                gap: 15px;
+            }
+
+            .cart-item-image {
+                width: 80px;
+                height: 80px;
+            }
+
+            .cart-item-actions {
+                grid-column: 1 / -1;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 15px;
+                padding-top: 15px;
+                border-top: 1px solid var(--border-color);
+            }
+
+            .menu {
+                display: none;
+            }
+        }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--success-color);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all var(--transition-speed) ease;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            background: var(--danger-color);
+        }
+    </style>
 </head>
 <body>
 
-<?php include 'navbar.php'; ?>
+<header>
+    <div class="logo">
+        <a href="category.php">N<span>anos</span></a>
+    </div>
 
-<div style="max-width: 900px; margin: 50px auto;">
-    <h1 style="color: #29d9d5; text-align: center;">🛒 Mon Panier</h1>
+    <ul class="menu">
+        <li><a href="category.php">Accueil</a></li>
+        <li><a href="profil.php">Mon Profil</a></li>
+        <li>
+            <a href="panier.php">
+                🛒 Panier 
+                <span class="cart-count" id="cartCount"><?= $itemCount ?></span>
+            </a>
+        </li>
+    </ul>
 
-    <?php if (empty($panier)): ?>
-        <p style="text-align: center; color: #aaa;">Votre panier est vide.</p>
+    <a href="contact.php" class="btn-reservation">Contact</a>
+</header>
+
+<div class="container">
+    <div class="page-header">
+        <h1>🛒 Mon Panier</h1>
+        <p><?= $itemCount ?> article<?= $itemCount > 1 ? 's' : '' ?> dans votre panier</p>
+    </div>
+
+    <?php if (empty($_SESSION['panier'])): ?>
+        <div class="cart-items">
+            <div class="empty-cart">
+                <div class="empty-cart-icon">🛒</div>
+                <h2>Votre panier est vide</h2>
+                <p>Découvrez nos produits et ajoutez-les à votre panier</p>
+                <a href="category.php" class="checkout-btn">Découvrir nos produits</a>
+            </div>
+        </div>
     <?php else: ?>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 30px;">
-            <thead>
-                <tr style="background-color: #29d9d5; color: white;">
-                    <th style="padding: 10px;">Image</th>
-                    <th>Nom</th>
-                    <th>Quantité</th>
-                    <th>Prix</th>
-                    <th>Sous-total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($panier as $item): 
-                    $sous_total = $item['price'] * $item['quantity'];
-                    $total += $sous_total;
-                ?>
-                <tr style="text-align: center;">
-                    <td><img src="../uploads/<?= htmlspecialchars($item['image']) ?>" style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;"></td>
-                    <td><?= htmlspecialchars($item['name']) ?></td>
-                    <td><?= $item['quantity'] ?></td>
-                    <td><?= number_format($item['price'], 2) ?> €</td>
-                    <td><?= number_format($sous_total, 2) ?> €</td>
-                </tr>
+        <div class="cart-wrapper">
+            <div class="cart-items">
+                <?php foreach ($_SESSION['panier'] as $index => $item): ?>
+                    <div class="cart-item" data-index="<?= $index ?>">
+                        <div class="cart-item-image">
+                            <?php 
+                            $imagePath = 'uploads/' . $item['image'];
+                            if (!file_exists($imagePath)) {
+                                $imagePath = 'uploads/default.png';
+                            }
+                            ?>
+                            <img src="<?= $imagePath ?>" alt="<?= htmlspecialchars($item['name']) ?>">
+                        </div>
+                        
+                        <div class="cart-item-details">
+                            <div>
+                                <div class="cart-item-title"><?= htmlspecialchars($item['name']) ?></div>
+                                <div class="cart-item-info">
+                                    <span>Prix unitaire: <?= number_format($item['price'], 2) ?> €</span>
+                                </div>
+                            </div>
+                            
+                            <div class="quantity-control">
+                                <button class="quantity-btn decrease-btn" data-index="<?= $index ?>">−</button>
+                                <input type="number" class="quantity-input" value="<?= $item['quantity'] ?>" min="1" data-index="<?= $index ?>">
+                                <button class="quantity-btn increase-btn" data-index="<?= $index ?>">+</button>
+                            </div>
+                        </div>
+                        
+                        <div class="cart-item-actions">
+                            <button class="remove-btn" data-index="<?= $index ?>" title="Supprimer">×</button>
+                            <div class="item-price"><?= number_format($item['price'] * $item['quantity'], 2) ?> €</div>
+                        </div>
+                    </div>
                 <?php endforeach; ?>
-            </tbody>
-        </table>
+            </div>
 
-        <div style="text-align: right; margin-top: 20px;">
-            <h3>Total : <?= number_format($total, 2) ?> €</h3>
-            <button style="margin-top: 10px; background-color: #29d9d5; border: none; padding: 12px 20px; font-size: 16px; font-weight: bold; color: black; border-radius: 8px; cursor: pointer;">
-                Procéder au paiement
-            </button>
+            <div class="cart-summary">
+                <h2>Résumé</h2>
+                
+                <div class="summary-row">
+                    <span>Sous-total</span>
+                    <span id="subtotal"><?= number_format($total, 2) ?> €</span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Livraison</span>
+                    <span>Gratuite</span>
+                </div>
+                
+                <div class="promo-code">
+                    <label>Code promo</label>
+                    <div class="promo-input">
+                        <input type="text" placeholder="Entrez votre code">
+                        <button>Appliquer</button>
+                    </div>
+                </div>
+                
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span id="total"><?= number_format($total, 2) ?> €</span>
+                </div>
+                
+                <button class="checkout-btn" onclick="window.location.href='checkout.php'">
+                    Procéder au paiement
+                </button>
+                
+                <a href="category.php" class="continue-shopping">
+                    ← Continuer mes achats
+                </a>
+                
+                <button class="clear-cart-btn" onclick="clearCart()">
+                    Vider le panier
+                </button>
+            </div>
         </div>
     <?php endif; ?>
 </div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function showToast(message, isError = false) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.toggle('error', isError);
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+
+function updateCart(index, quantity) {
+    fetch('panier.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `action=update_quantity&index=${index}&quantity=${quantity}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            showToast('Erreur lors de la mise à jour', true);
+        }
+    });
+}
+
+function removeItem(index) {
+    if (confirm('Voulez-vous vraiment supprimer cet article ?')) {
+        fetch('panier.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `action=remove_item&index=${index}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Article supprimé avec succès');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showToast('Erreur lors de la suppression', true);
+            }
+        });
+    }
+}
+
+function clearCart() {
+    if (confirm('Voulez-vous vraiment vider votre panier ?')) {
+        fetch('panier.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'action=clear_cart'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Panier vidé avec succès');
+                setTimeout(() => location.reload(), 1000);
+            }
+        });
+    }
+}
+
+// Gestion des boutons de quantité
+document.querySelectorAll('.increase-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const index = this.dataset.index;
+        const input = document.querySelector(`.quantity-input[data-index="${index}"]`);
+        const newQuantity = parseInt(input.value) + 1;
+        input.value = newQuantity;
+        updateCart(index, newQuantity);
+    });
+});
+
+document.querySelectorAll('.decrease-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const index = this.dataset.index;
+        const input = document.querySelector(`.quantity-input[data-index="${index}"]`);
+        const newQuantity = Math.max(1, parseInt(input.value) - 1);
+        input.value = newQuantity;
+        updateCart(index, newQuantity);
+    });
+});
+
+document.querySelectorAll('.quantity-input').forEach(input => {
+    input.addEventListener('change', function() {
+        const index = this.dataset.index;
+        const newQuantity = Math.max(1, parseInt(this.value));
+        this.value = newQuantity;
+        updateCart(index, newQuantity);
+    });
+});
+
+document.querySelectorAll('.remove-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const index = this.dataset.index;
+        removeItem(index);
+    });
+});
+</script>
 
 </body>
 </html>

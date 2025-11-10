@@ -1,4 +1,3 @@
-<!-- navbar.php -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -12,8 +11,16 @@
             padding: 0;
         }
 
+        :root {
+            --primary-color: #29d9d5;
+            --secondary-color: #1fb3af;
+            --dark-bg: #222;
+            --white-text: #fff;
+            --transition-speed: 0.3s;
+        }
+
         header {
-            background-color: #222;
+            background-color: var(--dark-bg);
             position: fixed;
             top: 0;
             left: 0;
@@ -30,30 +37,43 @@
         .logo a {
             font-size: 2.4rem;
             font-weight: bold;
-            color: #29d9d5;
+            color: var(--primary-color);
             text-decoration: none;
+            transition: color var(--transition-speed) ease;
+        }
+
+        .logo a:hover {
+            color: var(--secondary-color);
         }
 
         .logo a span {
-            color: #fff;
+            color: var(--white-text);
         }
 
         .menu {
             display: flex;
             list-style: none;
             align-items: center;
+            margin: 0;
         }
 
         .menu li {
             margin: 0 15px;
+            position: relative;
         }
 
         .menu li a {
-            color: #fff;
+            color: var(--white-text);
             font-size: 1.4rem;
             text-decoration: none;
             position: relative;
-            transition: color 0.3s ease;
+            transition: color var(--transition-speed) ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .menu li a:hover {
+            color: var(--primary-color);
         }
 
         .menu li a::after {
@@ -63,27 +83,39 @@
             bottom: -5px;
             height: 2px;
             width: 0%;
-            background-color: #29d9d5;
-            transition: width 0.3s ease;
+            background-color: var(--primary-color);
+            transition: width var(--transition-speed) ease;
         }
 
         .menu li a:hover::after {
             width: 100%;
         }
 
+        .cart-count {
+            background-color: var(--primary-color);
+            color: #000;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.8rem;
+            margin-left: 5px;
+            font-weight: bold;
+        }
+
         .btn-reservation {
-            color: #29d9d5;
+            color: var(--primary-color);
             font-size: 1.4rem;
-            border: 2px solid #29d9d5;
+            border: 2px solid var(--primary-color);
             padding: 5px 20px;
-            transition: 0.3s;
+            transition: all var(--transition-speed) ease;
             font-weight: bold;
             text-decoration: none;
+            border-radius: 4px;
         }
 
         .btn-reservation:hover {
-            background-color: #29d9d5;
-            color: #fff;
+            background-color: var(--primary-color);
+            color: var(--dark-bg);
+            transform: translateY(-2px);
         }
 
         .responsive-menu {
@@ -92,37 +124,57 @@
             height: 40px;
             position: relative;
             cursor: pointer;
+            background: none;
+            border: none;
         }
 
-        .responsive-menu::before,
-        .responsive-menu::after {
-            content: "";
+        .responsive-menu span {
             position: absolute;
             width: 100%;
             height: 3px;
-            background-color: #29d9d5;
+            background-color: var(--primary-color);
             left: 0;
-            transition: 0.4s;
+            transition: all 0.4s ease;
         }
 
-        .responsive-menu::before {
+        .responsive-menu span:nth-child(1) {
             top: 10px;
-            box-shadow: 0 10px 0 #29d9d5;
         }
 
-        .responsive-menu::after {
+        .responsive-menu span:nth-child(2) {
             top: 20px;
         }
 
-        .responsive-menu.active::before {
+        .responsive-menu span:nth-child(3) {
+            top: 30px;
+        }
+
+        .responsive-menu.active span:nth-child(1) {
             transform: rotate(45deg);
-            box-shadow: none;
             top: 18px;
         }
 
-        .responsive-menu.active::after {
+        .responsive-menu.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .responsive-menu.active span:nth-child(3) {
             transform: rotate(-45deg);
             top: 18px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            color: var(--white-text);
+            margin-right: 15px;
+        }
+
+        .user-info img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
         }
 
         @media (max-width: 768px) {
@@ -132,9 +184,9 @@
                 position: absolute;
                 top: 60px;
                 right: 0;
-                background-color: #222;
-                width: 200px;
-                padding: 10px 0;
+                background-color: var(--dark-bg);
+                width: 250px;
+                padding: 15px 0;
                 box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
                 animation: slideFadeIn 0.4s ease forwards;
             }
@@ -145,18 +197,26 @@
 
             .menu li {
                 margin: 10px 0;
-                text-align: left;
-                padding-left: 20px;
+                padding: 0 20px;
+                width: 100%;
+            }
+
+            .menu li a {
+                padding: 8px 0;
             }
 
             .responsive-menu {
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                display: block;
             }
 
             .btn-reservation {
                 display: none;
+            }
+
+            .user-info {
+                margin-right: 0;
+                margin-bottom: 10px;
+                padding-left: 20px;
             }
         }
 
@@ -180,39 +240,74 @@
     </div>
 
     <ul class="menu">
-        <li><a href="category.php">Accueil</a></li>
-        <li><a href="inscription.php">Inscription</a></li>
-        <li><a href="conection.php">Connexion</a></li>
-        <li><a href="panier.php">🛒 Panier (<?= isset($_SESSION['panier']) ? array_sum($_SESSION['panier']) : 0 ?>)</a></li>
+        <?php if(isset($_SESSION['user'])): ?>
+            <div class="user-info">
+                <img src="<?= htmlspecialchars($_SESSION['user']['avatar'] ?? 'uploads/default-avatar.png') ?>" alt="Avatar">
+                <span><?= htmlspecialchars($_SESSION['user']['prenom']) ?></span>
+            </div>
+            <li><a href="category.php">Accueil</a></li>
+            <li><a href="profil.php">Mon Profil</a></li>
+            <li><a href="deconnexion.php">Déconnexion</a></li>
+        <?php else: ?>
+            <li><a href="category.php">Accueil</a></li>
+            <li><a href="inscription.php">Inscription</a></li>
+            <li><a href="conection.php">Connexion</a></li>
+        <?php endif; ?>
+        
+        <li>
+            <a href="panier.php">
+                🛒 Panier 
+                <span class="cart-count">
+                    <?= isset($_SESSION['panier']) ? array_sum(array_column($_SESSION['panier'], 'quantity')) : 0 ?>
+                </span>
+            </a>
+        </li>
     </ul>
 
     <a href="contact.php" class="btn-reservation">Contact</a>
-    <div class="responsive-menu"></div>
+    <button class="responsive-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
 </header>
 
 <script>
-    const burger = document.querySelector('.responsive-menu');
-    const menu = document.querySelector('.menu');
-    const links = document.querySelectorAll('.menu li');
+    document.addEventListener('DOMContentLoaded', function() {
+        const burger = document.querySelector('.responsive-menu');
+        const menu = document.querySelector('.menu');
+        const links = document.querySelectorAll('.menu li:not(.user-info)');
 
-    burger.addEventListener('click', () => {
-        burger.classList.toggle('active');
-        menu.classList.toggle('responsive');
+        burger.addEventListener('click', () => {
+            burger.classList.toggle('active');
+            menu.classList.toggle('responsive');
 
-        if (menu.classList.contains('responsive')) {
-            links.forEach((link, index) => {
-                link.style.opacity = "0";
-                setTimeout(() => {
+            if (menu.classList.contains('responsive')) {
+                links.forEach((link, index) => {
+                    link.style.opacity = "0";
+                    link.style.transform = "translateX(20px)";
+                    setTimeout(() => {
+                        link.style.opacity = "1";
+                        link.style.transform = "translateX(0)";
+                        link.style.transition = `all 0.3s ease ${index * 100}ms`;
+                    }, 50);
+                });
+            } else {
+                links.forEach((link) => {
                     link.style.opacity = "1";
-                    link.style.transition = `opacity 0.3s ease ${index * 100}ms`;
-                }, 50);
-            });
-        } else {
-            links.forEach((link) => {
-                link.style.opacity = "1";
-                link.style.transition = "none";
-            });
-        }
+                    link.style.transform = "none";
+                    link.style.transition = "none";
+                });
+            }
+        });
+
+        // Fermer le menu quand on clique à l'extérieur
+        document.addEventListener('click', function(event) {
+            if (!menu.contains(event.target) && !burger.contains(event.target)) {
+                burger.classList.remove('active');
+                menu.classList.remove('responsive');
+            }
+        });
     });
 </script>
 
